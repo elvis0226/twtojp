@@ -96,9 +96,9 @@
   <script>
     async function fetchRate() {
       try {
-        const res = await fetch("https://api.exchangerate.host/latest?base=TWD&symbols=JPY");
+        const res = await fetch("https://twd-jpy-rate.elvis0226.workers.dev");
         const data = await res.json();
-        const rate = data.rates.JPY;
+        const rate = data.rate;
         document.getElementById("rate").value = rate.toFixed(4);
       } catch (e) {
         alert("無法取得即時匯率，請稍後再試");
