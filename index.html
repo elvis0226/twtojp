@@ -92,13 +92,14 @@
       <button onclick="calculate()">=</button>
     </div>
   </div>
+<p style="font-size:0.9em;color:#888;">資料來源：台灣銀行（via tw.rter.info）</p>
 
   <script>
     async function fetchRate() {
       try {
-        const res = await fetch("https://api.exchangerate.host/latest?base=TWD&symbols=JPY");
+        const res = await fetch("https://tw.rter.info/capi.php");
         const data = await res.json();
-        const rate = data.rates.JPY;
+        const rate = data["TWDJPY"].Exrate;
         document.getElementById("rate").value = rate.toFixed(4);
       } catch (e) {
         alert("無法取得即時匯率，請稍後再試");
