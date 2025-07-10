@@ -46,13 +46,42 @@
         <option value="jpyToTwd">日幣 ➜ 台幣</option>
       </select>
     </label><br/>
-    <label>匯率：<input type="number" id="rate" value="4.5" step="0.01"/></label><br/>
+    <label>匯率：<input type="number" id="rate" value="4.5" step="0.0001"/></label>
+    <button onclick="fetchRate()">🔄 即時匯率</button><br/>
     <button onclick="convert()">轉換</button>
     <button onclick="toggleFullscreen()">📲 全螢幕</button>
+
     <div class="result" id="result"></div>
+
+    <hr/>
+    <label>簡易計算機：<input id="calcInput" placeholder="如：100+25*3"/></label>
+    <button onclick="calculate()">=</button>
+    <span id="calcResult"></span>
   </div>
 
   <script>
+    async function fetchRate() {
+      try {
+        const res = await fetch("https://api.exchangerate.host/latest?base=TWD&symbols=JPY");
+        const data = await res.json();
+        const rate = data.rates.JPY;
+        document.getElementById("rate").value = rate.toFixed(4);
+      } catch (e) {
+        alert("無法取得即時匯率，請稍後再試");
+      }
+    }
+
+    function calculate() {
+      const input = document.getElementById("calcInput").value;
+      try {
+        const result = eval(input);
+        document.getElementById("calcResult").textContent = `= ${result}`;
+        document.getElementById("amount").value = result;
+      } catch {
+        document.getElementById("calcResult").textContent = "錯誤的算式";
+      }
+    }
+
     function convert() {
       const amount = parseFloat(document.getElementById('amount').value);
       const direction = document.getElementById('direction').value;
@@ -80,6 +109,8 @@
         document.exitFullscreen();
       }
     }
+
+    window.onload = fetchRate;
   </script>
 </body>
 </html>
