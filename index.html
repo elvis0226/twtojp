@@ -25,7 +25,7 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     input, select, button {
-      margin: 0.5em;
+      margin: 0.3em;
       padding: 0.5em;
       font-size: 1em;
     }
@@ -33,6 +33,23 @@
       margin-top: 1em;
       font-size: 1.2em;
       color: #2980b9;
+    }
+    .calc-display {
+      font-size: 1.2em;
+      margin-bottom: 0.5em;
+    }
+    .calc-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 60px);
+      gap: 0.5em;
+      justify-content: center;
+      margin-bottom: 1em;
+    }
+    .calc-buttons button {
+      padding: 1em;
+      font-size: 1.1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
@@ -46,7 +63,7 @@
         <option value="jpyToTwd">日幣 ➜ 台幣</option>
       </select>
     </label><br/>
-    <label>匯率：<input type="number" id="rate" value="4.9" step="0.0001"/></label>
+    <label>匯率：<input type="number" id="rate" value="4.5" step="0.0001"/></label>
     <button onclick="fetchRate()">🔄 即時匯率</button><br/>
     <button onclick="convert()">轉換</button>
     <button onclick="toggleFullscreen()">📲 全螢幕</button>
@@ -54,9 +71,26 @@
     <div class="result" id="result"></div>
 
     <hr/>
-    <label>簡易計算機：<input id="calcInput" placeholder="如：100+25*3"/></label>
-    <button onclick="calculate()">=</button>
-    <span id="calcResult"></span>
+    <div class="calc-display" id="calcDisplay">0</div>
+    <div class="calc-buttons">
+      <button onclick="appendCalc('7')">7</button>
+      <button onclick="appendCalc('8')">8</button>
+      <button onclick="appendCalc('9')">9</button>
+      <button onclick="appendCalc('+')">+</button>
+      <button onclick="appendCalc('4')">4</button>
+      <button onclick="appendCalc('5')">5</button>
+      <button onclick="appendCalc('6')">6</button>
+      <button onclick="appendCalc('-')">-</button>
+      <button onclick="appendCalc('1')">1</button>
+      <button onclick="appendCalc('2')">2</button>
+      <button onclick="appendCalc('3')">3</button>
+      <button onclick="appendCalc('*')">×</button>
+      <button onclick="appendCalc('0')">0</button>
+      <button onclick="appendCalc('.')">.</button>
+      <button onclick="clearCalc()">C</button>
+      <button onclick="appendCalc('/')">÷</button>
+      <button onclick="calculate()">=</button>
+    </div>
   </div>
 
   <script>
@@ -67,18 +101,7 @@
         const rate = data.rates.JPY;
         document.getElementById("rate").value = rate.toFixed(4);
       } catch (e) {
-        alert("無法取得即時匯率，請稍後再試或手動輸入");
-      }
-    }
-
-    function calculate() {
-      const input = document.getElementById("calcInput").value;
-      try {
-        const result = eval(input);
-        document.getElementById("calcResult").textContent = `= ${result}`;
-        document.getElementById("amount").value = result;
-      } catch {
-        document.getElementById("calcResult").textContent = "錯誤的算式";
+        alert("無法取得即時匯率，請稍後再試");
       }
     }
 
@@ -107,6 +130,36 @@
         el.requestFullscreen().catch(err => alert(`無法進入全螢幕: ${err.message}`));
       } else {
         document.exitFullscreen();
+      }
+    }
+
+    let calcInput = "";
+
+    function appendCalc(val) {
+      if (val === '*' || val === '/' || val === '+' || val === '-') {
+        if (calcInput === "" || /[+\-*/]$/.test(calcInput)) return;
+      }
+      calcInput += val === '×' ? '*' : val === '÷' ? '/' : val;
+      updateCalcDisplay();
+    }
+
+    function clearCalc() {
+      calcInput = "";
+      updateCalcDisplay();
+    }
+
+    function updateCalcDisplay() {
+      document.getElementById("calcDisplay").textContent = calcInput || "0";
+    }
+
+    function calculate() {
+      try {
+        const result = eval(calcInput);
+        document.getElementById("calcDisplay").textContent = "= " + result;
+        document.getElementById("amount").value = result;
+        calcInput = "";
+      } catch {
+        document.getElementById("calcDisplay").textContent = "錯誤";
       }
     }
 
